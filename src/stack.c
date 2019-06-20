@@ -3,7 +3,7 @@
 void init_stack(struct stack *stack, int init_size) {
   stack->stack_pointer = 0;
   stack->size = init_size;
-  stack->stack_array = (word_t *)malloc((size_t)stack->size);
+  stack->stack_array = (word_t *)malloc((size_t)stack->size * sizeof(word_t));
 }
 
 void init_frame(struct frame *frame, int program_counter_, int frame_pointer, int amount_vars) {

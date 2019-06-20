@@ -7,6 +7,9 @@ struct block *constant_pool;
 struct block *text;
 struct stack *my_stack;
 struct frame *first_frame;
+struct frame *tmp; //used for free'ing frames
+
+struct heap *my_heap;
 
 bool finish = false;
 
@@ -51,111 +54,81 @@ void read_binary_blocks(FILE *fp) {
 }
 
 bool step() {
-  //printf("this is pc: %d\n", program_counter);
   switch (get_instruction()) {
     case OP_BIPUSH:
-      //printf("BIPUSH\n");
       push(my_stack, (int8_t)text->data[program_counter + 1]);
-      //printf("we pushed: %d\n",my_stack->stack_array[program_counter]);
-      //printf("stack pointer: %d\n", my_stack->stack_pointer);
       program_counter++;
       break;
     case OP_DUP:
-      //printf("DUP\n");
       dup_and_push();
       break;
     case OP_ERR:
-      //printf("ERR\n");
       finish = true;
       return false;
       break;
     case OP_GOTO:
-      //printf("GOTO\n");
       go_to();
       break;
     case OP_HALT:
-      //printf("HALT\n");
       finish = true;
       return false;
       break;
     case OP_IADD:
-      //printf("IADD\n");
       add(my_stack);
-      //printf("push add: %d\n",my_stack->stack_array[program_counter]);
       break;
     case OP_IAND:
-      //printf("IAND\n");
       and(my_stack);
-      //printf("%d\n",my_stack->stack_array[program_counter]);
       break;
     case OP_IFEQ:
-      //printf("IFEQ\n");
       ifeq();
       break;
     case OP_IFLT:
-      //printf("IFLT\n");
       iflt();
       break;
     case OP_ICMPEQ:
-      //printf("ICMPEQ\n");
       icmpeq();
       break;
     case OP_IINC:
-      //printf("IINC\n");
       iinc();
       program_counter += 2;
       break;
     case OP_ILOAD:
-      //printf("ILOAD\n");
       load();
       program_counter++;
       break;
     case OP_IN:
-  	  //printf("IN\n");
       read_in();
   		break;
   	case OP_INVOKEVIRTUAL:
-  		//printf("INVOKEVIRTUAL\n");
       invoke_virtual();
 		  break;
   	case OP_IOR:
-  		//printf("IOR\n");
       or(my_stack);
   		break;
 		case OP_IRETURN:
-  		//printf("RETURN\n");
       ireturn();
   		break;
   	case OP_ISTORE:
-  		//printf("ISTORE\n");
       store(text->data[program_counter + 1]);
   		program_counter++;
   		break;
   	case OP_ISUB:
-  		//printf("SUB\n");
       sub(my_stack);
-      //printf("%d\n",my_stack->stack_array[program_counter + 1]);
   		break;
   	case OP_LDC_W:
-  		//printf("LDC_W\n");
       ldc_w();
       program_counter += 2;
   		break;
   	case OP_NOP:
-  		//printf("NOP\n");
       nop();
   		break;
   	case OP_OUT:
-  		//printf("OUT\n");
-      //fprintf(out, "%c\n", my_stack->stack_array[my_stack->stack_pointer - 1]);
       out_and_pop();
       break;
   	case OP_POP:
-  		//printf("POP\n");
       pop(my_stack);
   		break;
   	case OP_SWAP:
-  		//printf("SWAP\n");
       swap(my_stack);
   		break;
   	case OP_WIDE:
@@ -169,6 +142,16 @@ bool step() {
         program_counter += 2;
       }
   		break;
+    case OP_NEWARRAY:
+      printf("NEWARRAY\n");
+      break;
+    case OP_IALOAD:
+      printf("OP_IALOAD\n");
+      break;
+    case OP_IASTORE:
+      printf("OP_IASTORE\n");
+      break;
+
 
     default:
       return finish = true;
@@ -223,6 +206,7 @@ int init_ijvm(char *binary_file) {
 
   my_stack = create_stack(0);
   first_frame = create_frame(0,0,0);
+  my_heap = create_heap(0);
   return 0;
 }
 
@@ -238,6 +222,13 @@ struct frame *create_frame(int program_counter_, int frame_pointer, int local_va
   temp_frame = (struct frame *)malloc(sizeof(struct frame));
   init_frame(temp_frame, program_counter_, frame_pointer, local_vars);
   return temp_frame;
+}
+
+struct heap *create_heap(int init_size) {
+  struct heap *temp_heap;
+  temp_heap = (struct heap *)malloc(sizeof(struct heap));
+  init_heap(temp_heap, init_size);
+  return temp_heap;
 }
 
 struct frame *head_frame() { //head of ll
@@ -265,6 +256,13 @@ void destroy_ijvm() {
 
   free(my_stack->stack_array);
   free(my_stack);
+
+  while(first_frame != NULL) {
+    tmp = first_frame;
+    first_frame = first_frame->next_frame;
+    free(tmp->local_vars);
+    free(tmp);
+  }
 }
 
 int stack_size() {
@@ -364,7 +362,7 @@ word_t get_local_variable(int i) {
 void store(int i) {
   if((i + 1) > head_frame()->amount_vars) {
     head_frame()->amount_vars = (i+1);
-    head_frame()->local_vars = realloc(head_frame()->local_vars, (size_t)(head_frame()->amount_vars));
+    head_frame()->local_vars = realloc(head_frame()->local_vars, (size_t)(head_frame()->amount_vars)*sizeof(word_t));
   }
     head_frame()->local_vars[i] = pop(my_stack);
 }
@@ -381,7 +379,7 @@ void iinc() {
 
   if((first_byte_index + 1) > head_frame()->amount_vars) {
     head_frame()->amount_vars = (first_byte_index+1);
-    head_frame()->local_vars = realloc(head_frame()->local_vars, (size_t)(head_frame()->amount_vars));
+    head_frame()->local_vars = realloc(head_frame()->local_vars, (size_t)(head_frame()->amount_vars)*sizeof(word_t));
   }
     head_frame()->local_vars[first_byte_index] += (int8_t)second_byte_constant;
 }
@@ -436,7 +434,10 @@ void ireturn() {
     head = head->next_frame;
   }
 
+  free(head->next_frame->local_vars);
+  free(head->next_frame);
   head->next_frame = NULL;
+
   push(my_stack, return_value);
 }
 

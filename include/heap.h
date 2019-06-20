@@ -1,11 +1,9 @@
 #ifndef HEAP_H
-#define HEAP_H
+#define STACK_H
 
 #include <ijvm.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-#include <stack.h>
 
 #define OP_NEWARRAY ((byte_t) 0xD1)
 #define OP_IALOAD   ((byte_t) 0xD2)
@@ -13,19 +11,15 @@
 
 struct heap {
   word_t heap_size;
-  struct heap_element **location; //pointer to the pointer of the location of the array
+  struct heap_element **element;
 };
 
 struct heap_element {
-  word_t count; //must be of type int?
-  word_t *array;
-}
+  word_t count;
+  word_t *heap_array;
+};
 
-//void init_heap(void);
-
-
-
-
+void init_heap(struct heap *heap, int init_size);
 
 
 

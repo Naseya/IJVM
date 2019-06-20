@@ -6,6 +6,7 @@
 #include <byteswap.h>
 #include <stack.h>
 #include <assert.h>
+#include <heap.h>
 
 struct block {
   word_t origin;
@@ -23,6 +24,8 @@ void read_binary_blocks(FILE *fp);
 struct stack *create_stack(int init_size);
 
 struct frame *create_frame(int program_counter, int frame_pointer, int local_vars);
+
+struct heap *create_heap(int init_size);
 
 bool check_magic_number(FILE *fp);
 

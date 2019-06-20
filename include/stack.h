@@ -6,9 +6,9 @@
 #include <unistd.h>
 
 struct stack {
-      int stack_pointer;
-      int size;
-      word_t *stack_array;
+  int stack_pointer;
+  int size;
+  word_t *stack_array;
 };
 
 struct frame {

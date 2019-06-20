@@ -1,1 +1,1 @@
-obj/heap.o: src/heap.c
+obj/heap.o: src/heap.c include/heap.h include/ijvm.h

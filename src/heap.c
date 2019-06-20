@@ -1,7 +1,6 @@
-//#include <heap.h>
+#include <heap.h>
 
-//void init_heap(struct heap *heap) {
-//  heap->heap_size = 0;
-//  heap->location = malloc;
-
-//}
+void init_heap(struct heap *heap, int init_size) {
+  heap->heap_size = init_size;
+  heap->element = NULL;
+}
