@@ -143,13 +143,18 @@ bool step() {
       }
   		break;
     case OP_NEWARRAY:
-      printf("NEWARRAY\n");
+      //printf("NEWARRAY\n");
+      //push(my_stack, newarray(my_heap, my_stack));
+      newarray(my_heap, my_stack);
       break;
     case OP_IALOAD:
-      printf("OP_IALOAD\n");
+      //printf("IALOAD\n");
+      iaload(my_heap, my_stack);
       break;
     case OP_IASTORE:
-      printf("OP_IASTORE\n");
+      //printf("IASTORE\n");
+      iastore(my_heap, my_stack);
+
       break;
 
 
@@ -206,7 +211,7 @@ int init_ijvm(char *binary_file) {
 
   my_stack = create_stack(0);
   first_frame = create_frame(0,0,0);
-  my_heap = create_heap(0);
+  my_heap = create_heap();
   return 0;
 }
 
@@ -224,10 +229,10 @@ struct frame *create_frame(int program_counter_, int frame_pointer, int local_va
   return temp_frame;
 }
 
-struct heap *create_heap(int init_size) {
+struct heap *create_heap() {
   struct heap *temp_heap;
   temp_heap = (struct heap *)malloc(sizeof(struct heap));
-  init_heap(temp_heap, init_size);
+  init_heap(temp_heap);
   return temp_heap;
 }
 
@@ -263,6 +268,16 @@ void destroy_ijvm() {
     free(tmp->local_vars);
     free(tmp);
   }
+
+  for(int i = 0; i < my_heap->heap_size; i++){
+    free(my_heap->heap_element[i]);
+  }
+
+  free(my_heap);
+
+  
+
+  program_counter = 0;
 }
 
 int stack_size() {
