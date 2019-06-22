@@ -13,7 +13,7 @@ struct heap *my_heap;
 
 bool finish = false;
 
-static uint32_t swap_uint32(uint32_t num) {
+uint32_t swap_uint32(uint32_t num) {
   return ((num>>24)&0xff) | ((num<<8)&0xff0000) |((num>>8)&0xff00)| ((num>>8)&0xff00)| ((num<<24)&0xff000000);
 }
 
@@ -144,8 +144,8 @@ bool step() {
   		break;
     case OP_NEWARRAY:
       //printf("NEWARRAY\n");
-      //push(my_stack, newarray(my_heap, my_stack));
       newarray(my_heap, my_stack);
+      printf("start\n");
       break;
     case OP_IALOAD:
       //printf("IALOAD\n");
@@ -154,15 +154,35 @@ bool step() {
     case OP_IASTORE:
       //printf("IASTORE\n");
       iastore(my_heap, my_stack);
-
       break;
+
+    case OP_NETBIND:
+      printf("NETBIND\n");
+      netbind(my_stack);
+      break;
+    case OP_NETCONNECT:
+      printf("NETCONNECT\n");
+      netconnect(my_stack);
+      break;
+    case OP_NETIN:
+      printf("NETIN\n");
+      netin(my_stack);
+      break;
+    case OP_NETOUT:
+      printf("NETOUT\n");
+      netout(my_stack);
+      break;
+    case OP_NETCLOSE:
+      printf("NETCLOSE\n");
+      netclose();
+      break;      
 
 
     default:
       return finish = true;
       break;
   }
-/*
+/* 
   for(int i = 0; i < my_stack->size; i++) {
     printf("stack: %d\n", my_stack->stack_array[i]);
   }
@@ -253,6 +273,7 @@ word_t tos() {
 }
 
 void destroy_ijvm() {
+
   free(constant_pool->data);
   free(constant_pool);
 
@@ -268,14 +289,15 @@ void destroy_ijvm() {
     free(tmp->local_vars);
     free(tmp);
   }
-
+/*
   for(int i = 0; i < my_heap->heap_size; i++){
     free(my_heap->heap_element[i]);
   }
 
   free(my_heap);
-
-  
+*/
+  //mark_heap(my_heap);
+  //sweep_heap(my_heap);
 
   program_counter = 0;
 }
@@ -286,6 +308,7 @@ int stack_size() {
 
 void run(){
   while(step() && program_counter <= text->size);
+
   finish = true;
 }
 

@@ -7,6 +7,7 @@
 #include <stack.h>
 #include <assert.h>
 #include <heap.h>
+#include <network.h>
 
 struct block {
   word_t origin;
@@ -15,7 +16,7 @@ struct block {
 };
 struct frame *head_frame(void);
 
-static uint32_t swap_uint32(uint32_t num);
+uint32_t swap_uint32(uint32_t num);
 
 struct block *read_block(FILE *fp);
 

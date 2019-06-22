@@ -5,11 +5,19 @@ void init_heap(struct heap *heap) {
   heap->heap_element = NULL;//malloc((size_t)heap->heap_size * sizeof(word_t));
 }
 
+struct heap_element *new_element(word_t count) {
+  struct heap_element *element = malloc(sizeof(struct heap_element));
+  element->marked = false;
+  element->array = malloc((size_t)count * sizeof(word_t));
+
+  return element;
+}
+
 void newarray(struct heap *heap, struct stack *stack) {
-  word_t *array;
+  struct heap_element *array;
   word_t count = pop(stack);
 
-  array = malloc((size_t)count * sizeof(word_t));
+  array = new_element(count);
 
   heap->heap_size++; 
 
@@ -26,7 +34,7 @@ void iastore(struct heap *heap, struct stack *stack) {
   word_t value = pop(stack);
 
 
-  heap->heap_element[array_ref][index] = value;
+  heap->heap_element[array_ref]->array[index] = value;
 }
 
 void iaload(struct heap *heap, struct stack *stack) {
@@ -36,9 +44,36 @@ void iaload(struct heap *heap, struct stack *stack) {
   word_t index = pop(stack);
 
   //printf("final: %d\n", heap->element[array_ref]->heap_array[index]);
-  push(stack, heap->heap_element[array_ref][index]);
+  push(stack, heap->heap_element[array_ref]->array[index]);
+}
+/* 
+void mark(struct heap_element *heap_element) {
+  if(heap_element->marked == true) {
+    return;
+  }
+  if(heap_element->array != NULL{
+    heap_element->marked = true;
+  })
+  
 }
 
-void resize() {
-
+void mark_heap(struct heap *heap) {
+  for(word_t i = 0; i < heap->heap_size; i++) {
+    mark(heap->heap_element[i]);
+  }
 }
+
+
+void sweep(struct heap_element *heap_element) {
+  if(heap_element->array == NULL) {
+    free(heap_element->array);
+    free(heap_element);
+  }
+}
+
+void sweep_heap(struct heap *heap) {
+  for(int i = 0; i < heap->heap_size; i++) {
+    sweep(heap->heap_element[i]);
+  }
+}
+*/

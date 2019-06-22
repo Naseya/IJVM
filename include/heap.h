@@ -14,16 +14,30 @@
 
 struct heap {
   word_t heap_size;
-  word_t **heap_element;
+  struct heap_element **heap_element;
 };
 
+struct heap_element {
+  bool marked;
+  word_t *array;
+};
 
 void init_heap(struct heap *heap);
+
+struct heap_element *new_element(word_t count);
 
 void newarray(struct heap *my_heap, struct stack *my_stack);
 
 void iastore(struct heap *my_heap, struct stack *my_stack);
 
 void iaload(struct heap *my_heap, struct stack *my_stack);
+
+//void mark_heap(struct heap *heap);
+
+//void mark(struct heap_element *heap_element);
+
+//void sweep_heap(struct heap *heap);
+
+//void sweep(struct heap_element *heap_element);
 
 #endif
