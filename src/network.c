@@ -34,6 +34,7 @@ void netbind(struct stack *stack) {
     }
 
     new_fd = accept(socket_file_descriptor, NULL, NULL);
+    push(stack, new_fd);
     printf("The new fd is: %d\n", new_fd);
 }
 
@@ -67,7 +68,7 @@ void netconnect(struct stack *stack) {
         return;
     } else {
         printf("Connection Succesful\n");
-        push(stack, socket_file_descriptor);
+        push(stack, new_fd);
         return;
     }
 }
@@ -77,13 +78,14 @@ void netin(struct stack *stack) {
 	word_t netref = pop(stack);
 
 	recv(netref, &message_recv, sizeof(message_recv), 0);
-	push(stack, (word_t)message_recv);
+    printf("%c\n", message_recv);
+	push(stack, (char)message_recv);
 }
 
 void netout(struct stack *stack) {
-    char message_send = pop(stack);
+    char message_send = (char)pop(stack);
     word_t netref = pop(stack);
-
+    printf("%c\n", message_send);
 	send(netref, &message_send, sizeof(message_send), 0);
 }
  

@@ -10,7 +10,6 @@
 #define OP_NEWARRAY ((byte_t) 0xD1)
 #define OP_IALOAD   ((byte_t) 0xD2)
 #define OP_IASTORE  ((byte_t) 0xD3)
-#define OP_GARBAGE  ((byte_t) 0xD4)
 
 struct heap {
   word_t heap_size;
@@ -31,13 +30,5 @@ void newarray(struct heap *my_heap, struct stack *my_stack);
 void iastore(struct heap *my_heap, struct stack *my_stack);
 
 void iaload(struct heap *my_heap, struct stack *my_stack);
-
-//void mark_heap(struct heap *heap);
-
-//void mark(struct heap_element *heap_element);
-
-//void sweep_heap(struct heap *heap);
-
-//void sweep(struct heap_element *heap_element);
 
 #endif

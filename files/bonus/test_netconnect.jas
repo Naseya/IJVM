@@ -7,9 +7,9 @@
     LDC_W port
     LDC_W host
     NETCONNECT
-    NETIN
-    NETIN
     NETOUT
     NETOUT
+    NETIN
+    NETIN
     NETCLOSE
 .end-main

@@ -56,6 +56,7 @@ void read_binary_blocks(FILE *fp) {
 bool step() {
   switch (get_instruction()) {
     case OP_BIPUSH:
+    printf("BIPUSH\n");
       push(my_stack, (int8_t)text->data[program_counter + 1]);
       program_counter++;
       break;
@@ -70,6 +71,7 @@ bool step() {
       go_to();
       break;
     case OP_HALT:
+      printf("HALT\n");
       finish = true;
       return false;
       break;
@@ -100,15 +102,18 @@ bool step() {
       read_in();
   		break;
   	case OP_INVOKEVIRTUAL:
+      printf("INVOKE\n");
       invoke_virtual();
 		  break;
   	case OP_IOR:
       or(my_stack);
   		break;
 		case OP_IRETURN:
+      printf("IRETURN\n");
       ireturn();
   		break;
   	case OP_ISTORE:
+      printf("STORE\n");
       store(text->data[program_counter + 1]);
   		program_counter++;
   		break;
@@ -126,6 +131,7 @@ bool step() {
       out_and_pop();
       break;
   	case OP_POP:
+      printf("POP\n");
       pop(my_stack);
   		break;
   	case OP_SWAP:
@@ -143,19 +149,22 @@ bool step() {
       }
   		break;
     case OP_NEWARRAY:
-      //printf("NEWARRAY\n");
+      printf("NEWARRAY\n");
       newarray(my_heap, my_stack);
-      printf("start\n");
+      //printf("start\n");
       break;
     case OP_IALOAD:
-      //printf("IALOAD\n");
+      printf("IALOAD\n");
       iaload(my_heap, my_stack);
       break;
     case OP_IASTORE:
-      //printf("IASTORE\n");
+      printf("IASTORE\n");
       iastore(my_heap, my_stack);
       break;
-
+    case OP_GARBAGE:
+      printf("GARBAGEBOIIIIII\n");
+      
+      break;
     case OP_NETBIND:
       printf("NETBIND\n");
       netbind(my_stack);
@@ -182,11 +191,7 @@ bool step() {
       return finish = true;
       break;
   }
-/* 
-  for(int i = 0; i < my_stack->size; i++) {
-    printf("stack: %d\n", my_stack->stack_array[i]);
-  }
-*/
+ 
   program_counter++;
   return true;
 }

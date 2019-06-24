@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <heap.h>
 #include <network.h>
+#include <garbage.h>
 
 struct block {
   word_t origin;

@@ -1,0 +1,31 @@
+.constant
+.end-constant
+
+.main
+.var
+    tmp
+.end-var
+    BIPUSH 0x1
+    NEWARRAY
+    BIPUSH 0x2
+    NEWARRAY
+
+    ISTORE tmp
+
+    POP
+    BIPUSH 0x3
+    INVOKEVIRTUAL test
+    BIPUSH 0x4
+    NEWARRAY
+    BIPUSH 0x5
+    NEWARRAY
+    HALT
+
+.end-main
+
+.method test()
+    //GC
+    BIPUSH 0x6
+
+    IRETURN
+.end-method
