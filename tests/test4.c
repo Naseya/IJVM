@@ -100,7 +100,6 @@ void test_iteration_load()
 
     rewind(output_file);
     fread(buf, 1, 127, output_file);
-
     assert(strncmp(buf, LOADTEST4_OUTPUT, strlen(LOADTEST4_OUTPUT) + 1) == 0);
 
     destroy_ijvm();

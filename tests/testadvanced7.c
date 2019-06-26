@@ -104,7 +104,6 @@ static void run_mandelbread(void)
     FILE *out_file = tmpfile();
     set_output(out_file);
 
-
     if (!is_fast_enough())
     {
         puts("Your IJVM implementation simply isn't fast enough to run");
@@ -123,7 +122,6 @@ static void run_mandelbread(void)
     rewind(out_file);
     fread(buf, 1, sizeof(expected_output) + 1, out_file);
     printf("The glorious Mandelbread test output :D\n%s\n", buf);
-
 
     // Compare output
     assert(strncmp(buf, expected_output, sizeof(expected_output) + 1) == 0);

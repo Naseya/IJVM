@@ -13,7 +13,7 @@
  */
 
 /* uncomment the next line to see all succesful tests */
-//#define SHOW_ALL
+// #define SHOW_ALL
 
 #define stringify(x) #x
 #define nputs(str) fprintf(stdout, str "\n")
@@ -266,11 +266,9 @@ void test_advanced_1()
 
     assert_equal(OP_IRETURN, get_instruction());
     step();
-    printf("tos is: %d\n", tos());
     assert_equal(tos(), 10);
-    printf("GET INSTRUCTION0: %02X\n", get_instruction());
+
     assert_equal(OP_NOP, get_instruction());
-    printf("GET INSTRUCTION: %02X\n", get_instruction());
     step();
 
     assert_equal(OP_IRETURN, get_instruction());

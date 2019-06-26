@@ -16,15 +16,15 @@
     BIPUSH 0x3
     INVOKEVIRTUAL test
     BIPUSH 0x4
-    NEWARRAY
+    //NEWARRAY
     BIPUSH 0x5
-    NEWARRAY
+    //NEWARRAY
     HALT
 
 .end-main
 
 .method test()
-    //GC
+    GC
     BIPUSH 0x6
 
     IRETURN

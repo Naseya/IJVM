@@ -7,6 +7,9 @@
 #include <stack.h>
 #include <limits.h>
 
+#include <time.h>
+
+
 #define OP_NEWARRAY ((byte_t) 0xD1)
 #define OP_IALOAD   ((byte_t) 0xD2)
 #define OP_IASTORE  ((byte_t) 0xD3)
@@ -18,6 +21,7 @@ struct heap {
 
 struct heap_element {
   bool marked;
+  uint32_t reference;
   word_t *array;
 };
 

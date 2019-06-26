@@ -39,10 +39,9 @@ void netbind(struct stack *stack) {
 }
 
 void netconnect(struct stack *stack) {
-    
-    uint32_t address = (uint32_t)swap_uint32(pop(stack));
     int port = pop(stack);
-    
+    uint32_t address = (uint32_t)swap_uint32(pop(stack));
+
     struct sockaddr_in server_address;
     
     struct in_addr ipv4address;
@@ -61,14 +60,14 @@ void netconnect(struct stack *stack) {
         push(stack, 0);
         return;
     }
-    
+
     if (connect(socket_file_descriptor, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) { 
         printf("Connection Failed\n"); 
         push(stack, 0);
         return;
     } else {
         printf("Connection Succesful\n");
-        push(stack, new_fd);
+        push(stack, socket_file_descriptor);
         return;
     }
 }
@@ -83,8 +82,9 @@ void netin(struct stack *stack) {
 }
 
 void netout(struct stack *stack) {
-    char message_send = (char)pop(stack);
     word_t netref = pop(stack);
+    char message_send = (char)pop(stack);
+    
     printf("%c\n", message_send);
 	send(netref, &message_send, sizeof(message_send), 0);
 }

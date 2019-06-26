@@ -56,7 +56,7 @@ void read_binary_blocks(FILE *fp) {
 bool step() {
   switch (get_instruction()) {
     case OP_BIPUSH:
-    printf("BIPUSH\n");
+      //printf("BIPUSH\n");
       push(my_stack, (int8_t)text->data[program_counter + 1]);
       program_counter++;
       break;
@@ -71,7 +71,7 @@ bool step() {
       go_to();
       break;
     case OP_HALT:
-      printf("HALT\n");
+      //printf("HALT\n");
       finish = true;
       return false;
       break;
@@ -102,18 +102,19 @@ bool step() {
       read_in();
   		break;
   	case OP_INVOKEVIRTUAL:
-      printf("INVOKE\n");
+
+      //printf("INVOKE\n");
       invoke_virtual();
 		  break;
   	case OP_IOR:
       or(my_stack);
   		break;
 		case OP_IRETURN:
-      printf("IRETURN\n");
+      //printf("IRETURN\n");
       ireturn();
   		break;
   	case OP_ISTORE:
-      printf("STORE\n");
+      //printf("STORE\n");
       store(text->data[program_counter + 1]);
   		program_counter++;
   		break;
@@ -131,7 +132,7 @@ bool step() {
       out_and_pop();
       break;
   	case OP_POP:
-      printf("POP\n");
+      //printf("POP\n");
       pop(my_stack);
   		break;
   	case OP_SWAP:
@@ -150,6 +151,7 @@ bool step() {
   		break;
     case OP_NEWARRAY:
       printf("NEWARRAY\n");
+      
       newarray(my_heap, my_stack);
       //printf("start\n");
       break;
@@ -163,6 +165,7 @@ bool step() {
       break;
     case OP_GARBAGE:
       printf("GARBAGEBOIIIIII\n");
+      my_heap = gc(my_stack, my_heap, first_frame);
       
       break;
     case OP_NETBIND:
@@ -191,7 +194,8 @@ bool step() {
       return finish = true;
       break;
   }
- 
+  
+
   program_counter++;
   return true;
 }
@@ -294,15 +298,14 @@ void destroy_ijvm() {
     free(tmp->local_vars);
     free(tmp);
   }
-/*
-  for(int i = 0; i < my_heap->heap_size; i++){
+
+  for(int i = 0; i < my_heap->heap_size; i++) {
+    free(my_heap->heap_element[i]->array);
     free(my_heap->heap_element[i]);
   }
 
+  free(my_heap->heap_element);
   free(my_heap);
-*/
-  //mark_heap(my_heap);
-  //sweep_heap(my_heap);
 
   program_counter = 0;
 }

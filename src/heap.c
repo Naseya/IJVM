@@ -1,14 +1,16 @@
 #include <heap.h>
 
 void init_heap(struct heap *heap) {
-  heap->heap_size = 1; //array reference at the same time, first array on 0, second on 1 etc.
+  heap->heap_size = 0; //array reference at the same time, first array on 0, second on 1 etc.
   heap->heap_element = NULL;//malloc((size_t)heap->heap_size * sizeof(word_t));
 }
 
 struct heap_element *new_element(word_t count) {
   struct heap_element *element = malloc(sizeof(struct heap_element));
-  element->marked = false;
+  bool marked = false;
   element->array = malloc((size_t)count * sizeof(word_t));
+  element->reference = clock() * rand();
+  //printf("check ref: %d\n", element->reference);
 
   return element;
 }
@@ -22,10 +24,10 @@ void newarray(struct heap *heap, struct stack *stack) {
   heap->heap_size++; 
 
   heap->heap_element = realloc(heap->heap_element, (size_t)heap->heap_size * sizeof(word_t *));
-
   heap->heap_element[heap->heap_size - 1] = array;
 
-  push(stack, (heap->heap_size - 1));
+  push(stack, array->reference);
+  
 }
 
 void iastore(struct heap *heap, struct stack *stack) {
