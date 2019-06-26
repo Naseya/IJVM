@@ -7,10 +7,8 @@ void init_heap(struct heap *heap) {
 
 struct heap_element *new_element(word_t count) {
   struct heap_element *element = malloc(sizeof(struct heap_element));
-  bool marked = false;
   element->array = malloc((size_t)count * sizeof(word_t));
   element->reference = clock() * rand();
-  //printf("check ref: %d\n", element->reference);
 
   return element;
 }
@@ -45,6 +43,5 @@ void iaload(struct heap *heap, struct stack *stack) {
 
   word_t index = pop(stack);
 
-  //printf("final: %d\n", heap->element[array_ref]->heap_array[index]);
   push(stack, heap->heap_element[array_ref]->array[index]);
 }

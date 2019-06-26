@@ -74,7 +74,6 @@ void collect_frames(struct frame *first_frame, struct heap *heap) {
     for(int j = 0; j < heap->heap_size; j++) {
     for(int i = 0; i < root->amount_vars; i++) {
         if(root->local_vars[i] == heap->heap_element[j]->reference) {
-
           heap->heap_element[j]->marked = true; 
         }
       }

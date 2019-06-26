@@ -299,7 +299,7 @@ void destroy_ijvm() {
     free(tmp);
   }
 
-  for(int i = 0; i < my_heap->heap_size; i++) {
+  for(int i = 1; i < my_heap->heap_size; i++) {
     free(my_heap->heap_element[i]->array);
     free(my_heap->heap_element[i]);
   }
