@@ -1,3 +1,18 @@
+# Garbage collector
+
+### Strategy
+#### Heap
+ * Everytime we have to allocate a new array in the heap we give that a boolean called marked, this will later indicate if the array on the heap is still in use by the program or not.
+ * Everytime we have to allocate a new array in the heap we give it a reference and push this reference back on the stack.
+ 
+#### Garbage collector
+ * We assume that an array is not in use when its reference is not in either the stack or in a frame.
+ * Everytime we call the garbage collector we will replace our current heap, with a new heap that does not contain the unused arrays.
+ * We collect our unused array by checking if the reference of the array is in either the stack or the local variables in the frames, if that is the case we set the boolean value of marked to true. Everything that is unreachable/unused won't have the boolean value marked as true.
+ * We determine the size of the new heap by counting the amount of unreachable arrays.
+ * We initialize a new heap with all the reachable elements, the references stay the same. We reset the boolean marked back to false for all the arrays.
+ * Return the new heap.
+
 # Compiling
 Requires make and GCC or Clang
 
