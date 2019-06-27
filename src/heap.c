@@ -30,18 +30,24 @@ void newarray(struct heap *heap, struct stack *stack) {
 
 void iastore(struct heap *heap, struct stack *stack) {
   word_t array_ref = pop(stack);
-  word_t index = pop(stack) ;
+  word_t index = pop(stack);
   word_t value = pop(stack);
 
-
-  heap->heap_element[array_ref]->array[index] = value;
+  for(int i = 0; i < heap->heap_size; i++) {
+    if(heap->heap_element[i]->reference == array_ref) {
+      heap->heap_element[i]->array[index] = value;
+    }
+  }
+  
 }
 
 void iaload(struct heap *heap, struct stack *stack) {
-
   word_t array_ref = pop(stack);
-
   word_t index = pop(stack);
-
-  push(stack, heap->heap_element[array_ref]->array[index]);
+  for(int i = 0; i < heap->heap_size; i++) {
+    if(heap->heap_element[i]->reference == array_ref) {
+      push(stack, heap->heap_element[i]->array[index]);
+    }
+  }
+  
 }

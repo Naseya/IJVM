@@ -238,9 +238,9 @@ int init_ijvm(char *binary_file) {
 
   fclose(fp);
 
-  my_stack = (struct stack*)create_stack(0);
-  first_frame = (struct frame*)create_frame(0,0,0);
-  my_heap = (struct heap*)create_heap();
+  my_stack = create_stack(0);
+  first_frame = create_frame(0,0,0);
+  my_heap = create_heap();
   return 0;
 }
 
@@ -337,34 +337,29 @@ void out_and_pop(){
  }
 
 short short_bytes_signed() {
-  short temp = (short)(((uint32_t)text->data[program_counter + 1] << 8) | (uint32_t)text->data[program_counter + 2]);
-  return temp;
-}
-
-unsigned short short_bytes_unsigned2(byte_t *byte) {
-  unsigned short temp = (unsigned short)(((uint32_t)byte[0] << 8) | (uint32_t)byte[1]);
+  short temp = (short)((text->data[program_counter + 1] << 8) | text->data[program_counter + 2]);
   return temp;
 }
 
 unsigned short_bytes_unsigned() {
-  unsigned short temp = (unsigned short)(((uint32_t)text->data[program_counter + 1] << 8) | text->data[program_counter + 2]);
+  unsigned short temp = (unsigned short)((text->data[program_counter + 1] << 8) | text->data[program_counter + 2]);
   return temp;
 }
 
 void go_to() {
-  program_counter += ((int)short_bytes_signed() - 1);
+  program_counter += (short_bytes_signed() - 1);
 }
 
 void ifeq() {
   if(pop(my_stack) == 0) {
-    program_counter += ((int)short_bytes_signed() - 3);
+    program_counter += (short_bytes_signed() - 3);
   }
   program_counter += 2;
 }
 
 void iflt() {
   if(pop(my_stack) < 0) {
-    program_counter += ((int)short_bytes_signed() - 3);
+    program_counter += (short_bytes_signed() - 3);
   }
   program_counter += 2;
 }
@@ -373,7 +368,7 @@ void icmpeq() {
   word_t x = pop(my_stack);
   word_t y = pop(my_stack);
   if(x == y) {
-    program_counter += ((int)short_bytes_signed() - 3);
+    program_counter += (short_bytes_signed() - 3);
   }
   program_counter += 2;
 }
@@ -388,16 +383,16 @@ word_t get_constant(int index) {
   word_t constant;
   if(index < constant_pool->size) {
     offset = index * (int)sizeof(word_t);
-    constant = (int)convert_byte_to_word(&constant_pool->data[offset]);
+    constant = convert_byte_to_word(&constant_pool->data[offset]);
     return constant;
   }
   return -1;
 }
 
 void ldc_w() {
-  int index = (int)short_bytes_signed();
-  word_t constant = (word_t)get_constant(index);
-  push(my_stack, (word_t)constant);
+  int index = short_bytes_signed();
+  word_t constant = get_constant(index);
+  push(my_stack, constant);
 }
 
 word_t get_local_variable(int i) {
@@ -406,15 +401,15 @@ word_t get_local_variable(int i) {
 
 void store(int i) {
   if((i + 1) > head_frame()->amount_vars) {
-    head_frame()->amount_vars = (int)(i+1);
+    head_frame()->amount_vars = (i+1);
     head_frame()->local_vars = (word_t *)realloc(head_frame()->local_vars, (size_t)(head_frame()->amount_vars)*sizeof(word_t));
   }
-    head_frame()->local_vars[i] = (word_t)pop(my_stack);
+    head_frame()->local_vars[i] = pop(my_stack);
 }
 
 void load() {
-  word_t loadvar = (word_t)get_local_variable(text->data[program_counter + 1]);
-  push(my_stack, (word_t)loadvar);
+  word_t loadvar = get_local_variable(text->data[program_counter + 1]);
+  push(my_stack, loadvar);
 }
 
 void iinc() {
@@ -423,16 +418,16 @@ void iinc() {
   second_byte_constant = (int8_t)text->data[program_counter + 2];
 
   if((first_byte_index + 1) > head_frame()->amount_vars) {
-    head_frame()->amount_vars = (int)(first_byte_index+1);
+    head_frame()->amount_vars = (first_byte_index+1);
     head_frame()->local_vars = (word_t *)realloc(head_frame()->local_vars, (size_t)(head_frame()->amount_vars)*sizeof(word_t));
   }
-    head_frame()->local_vars[first_byte_index] += (int8_t)second_byte_constant;
+    head_frame()->local_vars[first_byte_index] += second_byte_constant;
 }
 
 void read_in() {
-  int in_ = (int)fgetc(in);
+  int in_ = fgetc(in);
   if(in_ != EOF) {
-    push(my_stack, (int)in_);
+    push(my_stack, in_);
   } else {
     push(my_stack, 0);
   }
@@ -443,7 +438,7 @@ void invoke_virtual() {
   struct frame *frame;
 
   old_program_counter = program_counter + 2;
-  program_counter = (int)get_constant(short_bytes_signed()) - 1;
+  program_counter = get_constant(short_bytes_signed()) - 1;
 
   amount_of_arguments = (int)short_bytes_unsigned();
 
@@ -455,25 +450,25 @@ void invoke_virtual() {
 
   _tmp_ = amount_of_arguments + amount_of_local_variables;
 
-  frame = (struct frame*)create_frame((int)old_program_counter, (int)my_stack->stack_pointer - (int)amount_of_arguments, _tmp_);
+  frame = create_frame(old_program_counter, my_stack->stack_pointer - amount_of_arguments, _tmp_);
 
   while(amount_of_arguments > 0) {
-    frame->local_vars[amount_of_arguments - 1] = (word_t)pop(my_stack);
+    frame->local_vars[amount_of_arguments - 1] = pop(my_stack);
     amount_of_arguments--;
   }
 
-  head_frame()->next_frame = (struct frame*)frame;
+  head_frame()->next_frame = frame;
 }
 
 void ireturn() {
-  word_t return_value = (word_t)pop(my_stack);
-  struct frame *head = (struct frame *)first_frame;
+  word_t return_value = pop(my_stack);
+  struct frame *head = first_frame;
 
   while(my_stack->stack_pointer > head_frame()->frame_pointer) {
-    (word_t)pop(my_stack);
+    pop(my_stack);
   }
 
-  program_counter = (int)head_frame()->program_counter;
+  program_counter = head_frame()->program_counter;
 
   while(head->next_frame->next_frame != NULL) {
     head = head->next_frame;

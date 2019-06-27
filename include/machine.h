@@ -49,8 +49,6 @@ void icmpeq(void);
 
 word_t convert_byte_to_word(byte_t *byte);
 
-unsigned short short_bytes_unsigned2(byte_t *byte);
-
 void ldc_w(void);
 
 void store(int i);
