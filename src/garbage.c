@@ -3,14 +3,13 @@
 int new_heap_size;
 
 struct heap *gc(struct stack *stack, struct heap *heap, struct frame *first_frame) {
-  new_heap_size = heap->heap_size;
   struct heap *new_heap;
-
+  new_heap_size = heap->heap_size;
+  
   collect(stack, heap, first_frame);
   destroy(heap);
   new_heap = reset_heap(heap);
   reset_marks(new_heap);
-  //printf("check ref: %d\n", heap->heap_element[0]->reference);
 
   return new_heap;
 }
@@ -20,7 +19,6 @@ void reset_marks(struct heap *heap) {
     heap->heap_element[i]->marked = false;
   }
 }
-
 
 struct heap *reset_heap(struct heap *heap) {
   struct heap *new_heap = malloc((size_t)new_heap_size * sizeof(struct heap));
@@ -49,7 +47,7 @@ struct heap *reset_heap(struct heap *heap) {
 
 void destroy(struct heap *heap) {
   for(int i = 0; i < heap->heap_size; i++) {
-    if(heap->heap_element[i]->marked == false) { new_heap_size--;}
+    if(heap->heap_element[i]->marked != true) { new_heap_size--;}
   }
 }
 

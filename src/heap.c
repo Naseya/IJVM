@@ -8,7 +8,7 @@ void init_heap(struct heap *heap) {
 struct heap_element *new_element(word_t count) {
   struct heap_element *element = malloc(sizeof(struct heap_element));
   element->array = malloc((size_t)count * sizeof(word_t));
-  element->reference = clock() * rand();
+  element->reference = (word_t)clock();
 
   return element;
 }
@@ -24,7 +24,7 @@ void newarray(struct heap *heap, struct stack *stack) {
   heap->heap_element = realloc(heap->heap_element, (size_t)heap->heap_size * sizeof(word_t *));
   heap->heap_element[heap->heap_size - 1] = array;
 
-  push(stack, array->reference);
+  push(stack, (word_t)array->reference);
   
 }
 

@@ -28,11 +28,11 @@ word_t pop(struct stack *stack) {
 }
 
 void add(struct stack *stack) {
-  word_t x, y, z;
-  x = pop(stack);
-  y = (word_t)pop(stack);
+  uint32_t x, y, z;
+  x = (uint32_t)pop(stack);
+  y = (uint32_t)pop(stack);
   z = x + y;
-  push(stack, z);
+  push(stack, (word_t)z);
 }
 
 void sub(struct stack *stack) {

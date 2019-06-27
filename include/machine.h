@@ -27,7 +27,7 @@ struct stack *create_stack(int init_size);
 
 struct frame *create_frame(int program_counter, int frame_pointer, int local_vars);
 
-struct heap *create_heap();
+struct heap *create_heap(void);
 
 bool check_magic_number(FILE *fp);
 

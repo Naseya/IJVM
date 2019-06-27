@@ -21,7 +21,7 @@ struct heap {
 
 struct heap_element {
   bool marked;
-  uint32_t reference;
+  word_t reference;
   word_t *array;
 };
 

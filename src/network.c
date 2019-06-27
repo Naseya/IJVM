@@ -1,7 +1,7 @@
 #include <network.h>
 
 void netbind(struct stack *stack) {
-    int port = pop(stack);
+    uint16_t port = (uint16_t)pop(stack);
 
     struct sockaddr_in server_address;
 
@@ -39,8 +39,8 @@ void netbind(struct stack *stack) {
 }
 
 void netconnect(struct stack *stack) {
-    int port = pop(stack);
-    uint32_t address = (uint32_t)swap_uint32(pop(stack));
+    uint16_t port = (uint16_t)pop(stack);
+    uint32_t address = (uint32_t)swap_uint32((uint32_t)pop(stack));
 
     struct sockaddr_in server_address;
     
