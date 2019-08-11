@@ -19,7 +19,9 @@ uint32_t swap_uint32(uint32_t num) {
 
 bool check_magic_number(FILE *fp) {
   word_t magic_number;
-  assert(fread(&magic_number, sizeof(word_t), 1, fp) == 1);
+  if(fread(&magic_number, sizeof(word_t), 1, fp) == 1){} else {
+    exit(1);
+  };
 
   magic_number = (word_t)swap_uint32((uint32_t)magic_number);
   if(magic_number != MAGIC_NUMBER) {
@@ -32,29 +34,42 @@ void read_binary_blocks(FILE *fp) {
   constant_pool = (struct block *)malloc(sizeof(struct block));
   text = (struct block *)malloc(sizeof(struct block));
 
-  assert(fread(&constant_pool->origin, sizeof(word_t), 1, fp) == 1);
-  assert(fread(&constant_pool->size, sizeof(word_t), 1, fp) == 1);
+  if(fread(&constant_pool->origin, sizeof(word_t), 1, fp) == 1){} else {
+    exit(1);
+  }
+  if(fread(&constant_pool->size, sizeof(word_t), 1, fp) == 1) {} else {
+    exit(1);
+  }
 
   constant_pool->size = (word_t)swap_uint32((uint32_t)constant_pool->size);
   constant_pool->data = (byte_t *)malloc((size_t)constant_pool->size);
 
   if(constant_pool->size > 0) {
-    assert(fread(constant_pool->data, 1, (size_t)constant_pool->size, fp) > 0);
+    if(fread(constant_pool->data, 1, (size_t)constant_pool->size, fp) > 0) {} else {
+      exit(1);
+    }
   } 
 
-  assert(fread(&text->origin, sizeof(word_t), 1, fp) == 1);
-  assert(fread(&text->size, sizeof(word_t), 1, fp) == 1);
+  if(fread(&text->origin, sizeof(word_t), 1, fp) == 1){} else {
+    exit(1);
+  }
+  if(fread(&text->size, 4, 1, fp) == 1) {} else {
+    exit(1);
+  }
 
   text->size = (word_t)swap_uint32((uint32_t)text->size);
   text->data = (byte_t *)malloc((size_t)text->size);
 
   if(text->size > 0) {
-    assert(fread(text->data, 1, (size_t)text->size, fp) > 0);
+    if(fread(text->data, 1, (size_t)text->size, fp) > 0){} else {
+      exit(1);
+    }
   }
 }
 
 bool step() {
-  switch (get_instruction()) {
+  word_t operation = get_instruction();
+  switch (operation) {
     case OP_BIPUSH:
       //printf("BIPUSH\n");
       push(my_stack, (int8_t)text->data[program_counter + 1]);
@@ -64,15 +79,12 @@ bool step() {
       dup_and_push();
       break;
     case OP_ERR:
-      finish = true;
       return false;
       break;
     case OP_GOTO:
       go_to();
       break;
     case OP_HALT:
-      //printf("HALT\n");
-      finish = true;
       return false;
       break;
     case OP_IADD:
@@ -102,19 +114,15 @@ bool step() {
       read_in();
   		break;
   	case OP_INVOKEVIRTUAL:
-
-      //printf("INVOKE\n");
       invoke_virtual();
 		  break;
   	case OP_IOR:
       or(my_stack);
   		break;
 		case OP_IRETURN:
-      //printf("IRETURN\n");
       ireturn();
   		break;
   	case OP_ISTORE:
-      //printf("STORE\n");
       store(text->data[program_counter + 1]);
   		program_counter++;
   		break;
@@ -126,7 +134,6 @@ bool step() {
       program_counter += 2;
   		break;
   	case OP_NOP:
-      nop();
   		break;
   	case OP_OUT:
       out_and_pop();
@@ -150,85 +157,85 @@ bool step() {
       }
   		break;
     case OP_NEWARRAY:
-      //printf("NEWARRAY\n");
-      
       newarray(my_heap, my_stack);
-      //printf("start\n");
       break;
     case OP_IALOAD:
-      //printf("IALOAD\n");
       iaload(my_heap, my_stack);
       break;
     case OP_IASTORE:
-      //printf("IASTORE\n");
       iastore(my_heap, my_stack);
       break;
     case OP_GARBAGE:
-      //printf("GARBAGEBOIIIIII\n");
       my_heap = gc(my_stack, my_heap, first_frame);
-      
       break;
     case OP_NETBIND:
-      //printf("NETBIND\n");
       netbind(my_stack);
       break;
     case OP_NETCONNECT:
-      //printf("NETCONNECT\n");
       netconnect(my_stack);
       break;
     case OP_NETIN:
-      //printf("NETIN\n");
       netin(my_stack);
       break;
     case OP_NETOUT:
-      //printf("NETOUT\n");
       netout(my_stack);
       break;
     case OP_NETCLOSE:
-      //printf("NETCLOSE\n");
       netclose();
       break;      
-
-
     default:
-      return finish = true;
+      finish = true;
       break;
   }
-  
 
   program_counter++;
   return true;
 }
 
-void nop() {
-
-}
-
-byte_t get_instruction(void) {
-  return text->data[program_counter];
+byte_t get_instruction() {
+  if(text->data != NULL && text->size >= program_counter) {
+    return text->data[program_counter];
+  } else {
+    exit(0);
+  }
 }
 
 int get_program_counter() {
-  return program_counter;
+  if(program_counter >= 0) {
+    return program_counter;
+  } else {
+    exit(0);
+  }
+  
 }
 
 byte_t *get_text() {
-  return text->data;
+  if(text->data != NULL) {
+    return text->data;
+  } else {
+    exit(0);
+  }
+  
 }
 
 int text_size() {
-	return text->size;
+  if(text->size >= 0) {
+    return text->size;
+  } else {
+    exit(0);
+  }
+	
 }
 
 int init_ijvm(char *binary_file) {
   FILE *fp;
   program_counter = 0;
 	if ((fp = fopen(binary_file, "rb")) == NULL) {
-		return -1;
+		exit(0);
   }
 
   if(check_magic_number(fp) == false) {
-    return -1;
+    exit(0);
   }
 
   read_binary_blocks(fp);
@@ -238,39 +245,11 @@ int init_ijvm(char *binary_file) {
 
   fclose(fp);
 
-  my_stack = create_stack(0);
+  my_stack = create_stack(my_stack, 0);
   first_frame = create_frame(0,0,0);
-  my_heap = create_heap();
+  my_heap = create_heap(my_heap);
+
   return 0;
-}
-
-struct stack *create_stack(int init_size) {
-  struct stack *temp_stack;
-  temp_stack = (struct stack *)malloc(sizeof(struct stack));
-  init_stack(temp_stack, init_size);
-  return temp_stack;
-}
-
-struct frame *create_frame(int program_counter_, int frame_pointer, int local_vars) {
-  struct frame *temp_frame;
-  temp_frame = (struct frame *)malloc(sizeof(struct frame));
-  init_frame(temp_frame, program_counter_, frame_pointer, local_vars);
-  return temp_frame;
-}
-
-struct heap *create_heap() {
-  struct heap *temp_heap;
-  temp_heap = (struct heap *)malloc(sizeof(struct heap));
-  init_heap(temp_heap);
-  return temp_heap;
-}
-
-struct frame *head_frame() { //head of ll
-  struct frame *head = first_frame;
-  while(head->next_frame != NULL) {
-    head = head->next_frame;
-  }
-  return head;
 }
 
 word_t *get_stack() {
@@ -282,6 +261,8 @@ word_t tos() {
 }
 
 void destroy_ijvm() {
+
+  //my_heap = gc(my_stack, my_heap, first_frame);
 
   free(constant_pool->data);
   free(constant_pool);
@@ -315,8 +296,8 @@ int stack_size() {
 }
 
 void run(){
-  while(step());
-  finish = true;
+  while(step() && !finished()) {
+  };
 }
 
 void set_input(FILE *fp) {
@@ -396,15 +377,15 @@ void ldc_w() {
 }
 
 word_t get_local_variable(int i) {
-  return head_frame()->local_vars[i];
+  return head_frame(first_frame)->local_vars[i];
 }
 
 void store(int i) {
-  if((i + 1) > head_frame()->amount_vars) {
-    head_frame()->amount_vars = (i+1);
-    head_frame()->local_vars = (word_t *)realloc(head_frame()->local_vars, (size_t)(head_frame()->amount_vars)*sizeof(word_t));
+  if((i + 1) > head_frame(first_frame)->amount_vars) {
+    head_frame(first_frame)->amount_vars = (i+1);
+    head_frame(first_frame)->local_vars = (word_t *)realloc(head_frame(first_frame)->local_vars, (size_t)(head_frame(first_frame)->amount_vars)*sizeof(word_t));
   }
-    head_frame()->local_vars[i] = pop(my_stack);
+    head_frame(first_frame)->local_vars[i] = pop(my_stack);
 }
 
 void load() {
@@ -417,11 +398,11 @@ void iinc() {
   int first_byte_index = (int)text->data[program_counter + 1];;
   second_byte_constant = (int8_t)text->data[program_counter + 2];
 
-  if((first_byte_index + 1) > head_frame()->amount_vars) {
-    head_frame()->amount_vars = (first_byte_index+1);
-    head_frame()->local_vars = (word_t *)realloc(head_frame()->local_vars, (size_t)(head_frame()->amount_vars)*sizeof(word_t));
+  if((first_byte_index + 1) > head_frame(first_frame)->amount_vars) {
+    head_frame(first_frame)->amount_vars = (first_byte_index+1);
+    head_frame(first_frame)->local_vars = (word_t *)realloc(head_frame(first_frame)->local_vars, (size_t)(head_frame(first_frame)->amount_vars)*sizeof(word_t));
   }
-    head_frame()->local_vars[first_byte_index] += second_byte_constant;
+    head_frame(first_frame)->local_vars[first_byte_index] += second_byte_constant;
 }
 
 void read_in() {
@@ -457,18 +438,18 @@ void invoke_virtual() {
     amount_of_arguments--;
   }
 
-  head_frame()->next_frame = frame;
+  head_frame(first_frame)->next_frame = frame;
 }
 
 void ireturn() {
   word_t return_value = pop(my_stack);
   struct frame *head = first_frame;
 
-  while(my_stack->stack_pointer > head_frame()->frame_pointer) {
+  while(my_stack->stack_pointer > head_frame(first_frame)->frame_pointer) {
     pop(my_stack);
   }
 
-  program_counter = head_frame()->program_counter;
+  program_counter = head_frame(first_frame)->program_counter;
 
   while(head->next_frame->next_frame != NULL) {
     head = head->next_frame;

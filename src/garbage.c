@@ -1,22 +1,25 @@
 #include <garbage.h>
 
-int new_heap_size;
+static int new_heap_size = 0;
 
 struct heap *gc(struct stack *stack, struct heap *heap, struct frame *first_frame) {
   struct heap *new_heap;
-  new_heap_size = heap->heap_size;
   
   collect(stack, heap, first_frame);
   destroy(heap);
   new_heap = reset_heap(heap);
+  printf("size: %d\n", new_heap->heap_size);
+  //new_heap->heap_element[2];
   reset_marks(new_heap);
 
   return new_heap;
 }
 
-void reset_marks(struct heap *heap) {
-  for(int i = 0; i < heap->heap_size; i++) {
-    heap->heap_element[i]->marked = false;
+void reset_marks(struct heap *new_heap) {
+  if(new_heap->heap_size > 0) {
+    for(int i = 0; i < new_heap->heap_size; i++) {
+      new_heap->heap_element[i]->marked = false;
+    }
   }
 }
 
@@ -47,7 +50,7 @@ struct heap *reset_heap(struct heap *heap) {
 
 void destroy(struct heap *heap) {
   for(int i = 0; i < heap->heap_size; i++) {
-    if(heap->heap_element[i]->marked != true) { new_heap_size--;}
+    if(heap->heap_element[i]->marked == true) { new_heap_size++;}
   }
 }
 

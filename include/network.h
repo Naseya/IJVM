@@ -23,14 +23,20 @@
 int socket_file_descriptor;
 int new_fd;
 
+//act as the server, bind with a port and listen for incoming clients,
+//accept if someone wants to connect
 void netbind(struct stack *stack);
 
+//you are the client, connect with an IP on a certain port number
 void netconnect(struct stack *stack);
 
+//pop netref from the stack, reads a character from the network
 void netin(struct stack *stack);
 
+//pops netref and message from the stack and send that over the network
 void netout(struct stack *stack);
 
+//close the connection
 void netclose(void);
 
 #endif

@@ -1,3 +1,45 @@
+# Hardening
+
+### Make functions
+ #### Compiles or passes on:
+  * Make pedantic
+  * Make testsanitizers
+  
+ #### Strategy
+  * Let the fuzzer run for 30 minutes
+  * Collect a few binaries that are generated for which the IJVM crashed
+  * Adjust the code so it can handle the binaries properly
+  * Fuzz again
+  
+ #### 1st iteration
+  * 1 cyle, 445 total paths, 144 unique crashes, 87 unique hangs
+  * Remove the assert functions in machine.c and replace them with if statements, exit the program if it doesn't meet the condition.
+  * Make the function 'pop' quit the program if it is called, but the stack is empty.
+  
+ #### 2nd iteration
+  * 4 cycles, 347 paths, 109 unique crashes, 34 unique hangs
+  * Fix the function 'finished', incorporate it in the step function, before the function only existed to pass testadvanced7.
+  * Adjust getters in machine.c with if-statements and exit the program if it doesn't meet the if condition.
+  * Adjust all the functions that use pop to check for the contents of the stack, if it is not possible to pop then quit the program.
+  
+ Got stuck on a heap-buffer-overflow that I wasn't able to solve in time.
+
+# Garbage collector
+
+### Strategy
+#### Heap
+ * Everytime we have to allocate a new array in the heap we give that a boolean called marked, this will later indicate if the array on the heap is still in use by the program or not.
+ * Everytime we have to allocate a new array in the heap we give it a reference and push this reference back on the stack.
+
+#### Garbage collector
+ * We assume that an array is not in use when its reference is not in either the stack or in a frame.
+ * Everytime we call the garbage collector we will replace our current heap, with a new heap that does not contain the unused arrays.
+ * We collect our unused array by checking if the reference of the array is in either the stack or the local variables in the frames, if that is the case we set the boolean value of marked to true. Everything that is unreachable/unused won't have the boolean value marked as true.
+ * We determine the size of the new heap by counting the amount of reachable arrays.
+ * We initialize a new heap with all the reachable elements, the references stay the same. We reset the boolean marked back to false for all the arrays.
+ * Return the new heap.
+
+
 # Compiling
 Requires make and GCC or Clang
 
